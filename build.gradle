@@ -1,0 +1,107 @@
+plugins {
+    id 'checkstyle'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'org.springframework.boot' version '2.1.7.RELEASE'
+    id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.github.ben-manes.versions' version '0.22.0'
+    id 'java-library'
+    id 'net.ltgt.apt' version '0.21'
+}
+
+group 'uk.gov.hmcts.reform'
+version '0.0.1'
+
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
+}
+
+def springBootVersion = '2.1.6.RELEASE'
+
+checkstyle {
+    maxWarnings = 0
+    toolVersion = '8.22'
+}
+
+sourceCompatibility = 1.8
+
+compileJava {
+    options.compilerArgs << '-parameters' << '-Xlint:deprecation'
+}
+
+compileTestJava {
+    options.compilerArgs << '-Xlint:deprecation'
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': project.name, 'Implementation-Version': project.version
+    }
+}
+
+task printVersion {
+    doLast {
+        print project.version
+    }
+}
+
+def gitRepo = "https://github.com/hmcts/fees-java-client"
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def versions = [
+        logback           : '1.2.3',
+        springBoot        : springBootVersion,
+        springfoxSwagger  : '2.9.2',
+        reformJavaLogging : '5.0.1'
+]
+
+dependencies {
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
+
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
+    compile group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformJavaLogging
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.1'
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.1'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
