@@ -2,7 +2,6 @@ plugins {
     id 'checkstyle'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'org.springframework.boot' version '2.1.7.RELEASE'
-    id 'com.jfrog.bintray' version '1.8.4'
     id 'com.github.ben-manes.versions' version '0.22.0'
     id 'java-library'
     id 'net.ltgt.apt' version '0.21'
@@ -79,14 +78,33 @@ test {
     useJUnitPlatform()
 }
 
+ext {
+    lombokVersion = '1.18.8'
+    springCloudVersion = 'Greenwich.SR2'
+    feignVersion = '10.2.3'
+}
+
 def versions = [
-        logback           : '1.2.3',
-        springBoot        : springBootVersion,
-        springfoxSwagger  : '2.9.2',
-        reformJavaLogging : '5.0.1'
+    logback           : '1.2.3',
+    springBoot        : springBootVersion,
+    springfoxSwagger  : '2.9.2',
+    reformJavaLogging : '5.0.1',
+    junitJupiter      : '5.5.1'
 ]
 
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
 dependencies {
+    api group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
+    api group: 'io.github.openfeign', name: 'feign-jackson', version: feignVersion
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
@@ -94,8 +112,7 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformJavaLogging
 
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.1'
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.1'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: versions.junitJupiter
 }
 
 bootJar {
@@ -104,4 +121,10 @@ bootJar {
 
 jar {
     enabled = true
+    manifest {
+        attributes(
+            'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+            'Main-Class': 'Main'
+        )
+    }
 }
