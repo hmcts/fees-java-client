@@ -20,6 +20,7 @@ public class FeeVersionSubDeserializer {
         }
 
         FeeVersion version = new FeeVersion();
+
         extractNode(version::setDescription, JsonNode::asText, node, "description");
         extractNode(version::setStatus, JsonNode::asText, node, "status");
         extractNode(version::setVersion, JsonNode::asInt, node, "version");
@@ -28,6 +29,7 @@ public class FeeVersionSubDeserializer {
         extractNode(version::setMemoLine, JsonNode::asText, node, "memo_line");
         extractNode(version::setNaturalAccountCode, JsonNode::asText, node, "natural_account_code");
         extractNode(version::setDirection, JsonNode::asText, node, "direction");
+
         return version;
     }
 }

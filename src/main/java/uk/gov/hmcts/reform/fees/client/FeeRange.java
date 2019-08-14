@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.fees.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import uk.gov.hmcts.reform.fees.client.deserialization.FeeRangeDeserializer;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Data
 @JsonDeserialize(using = FeeRangeDeserializer.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class FeeRange {
     private String code;
     private String feeType;
