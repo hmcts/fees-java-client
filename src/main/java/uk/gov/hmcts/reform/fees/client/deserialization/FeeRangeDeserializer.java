@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.fees.client.deserialization;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -21,15 +20,11 @@ public class FeeRangeDeserializer extends StdDeserializer<FeeRange> {
     private final FeeVersionSubDeserializer feeVersionDeserializer = new FeeVersionSubDeserializer();
 
     public FeeRangeDeserializer() {
-        this(FeeRange.class);
-    }
-
-    public FeeRangeDeserializer(Class<?> vc) {
-        super(vc);
+        super(FeeRange.class);
     }
 
     @Override
-    public FeeRange deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public FeeRange deserialize(JsonParser jp, DeserializationContext context) throws IOException {
         JsonNode node = jp.getCodec().readTree(jp);
         if (node == null || node.isMissingNode() || node.isNull()) {
             return null;
@@ -53,6 +48,7 @@ public class FeeRangeDeserializer extends StdDeserializer<FeeRange> {
         range.setFeeVersions(extractFeeVersions(node.get("fee_versions")));
         range.setCurrentVersion(feeVersionDeserializer.deserialize(node.get("current_version")));
         range.setMatchingVersion(feeVersionDeserializer.deserialize(node.get("matching_version")));
+
         return range;
     }
 
