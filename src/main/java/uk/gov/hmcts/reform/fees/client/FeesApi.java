@@ -8,13 +8,13 @@ import java.math.BigDecimal;
 
 @FeignClient(name = "fees-api", url = "${fees.api.url}")
 public interface FeesApi {
-    @GetMapping("/fees-register/fees/lookup" +
-            "?service={service}" +
-            "&jurisdiction1={jurisdiction1}" +
-            "&jurisdiction2={jurisdiction2}" +
-            "&channel={channel}" +
-            "&event={eventType}" +
-            "&amount_or_volume={amount}"
+    @GetMapping("/fees-register/fees/lookup"
+            + "?service={service}"
+            + "&jurisdiction1={jurisdiction1}"
+            + "&jurisdiction2={jurisdiction2}"
+            + "&channel={channel}"
+            + "&event={eventType}"
+            + "&amount_or_volume={amount}"
     )
     FeeOutcome lookupFee(
             @PathVariable("service") String service,
@@ -25,13 +25,13 @@ public interface FeesApi {
             @PathVariable("amount") BigDecimal amount
     );
 
-    @GetMapping("/fees-register/fees" +
-            "?service={service}" +
-            "&jurisdiction1={jurisdiction1}" +
-            "&jurisdiction2={jurisdiction2}" +
-            "&channel={channel}" +
-            "&event={eventType}" +
-            "&feeVersionStatus=approved"
+    @GetMapping("/fees-register/fees"
+            + "?service={service}"
+            + "&jurisdiction1={jurisdiction1}"
+            + "&jurisdiction2={jurisdiction2}"
+            + "&channel={channel}"
+            + "&event={eventType}"
+            + "&feeVersionStatus=approved"
     )
     FeeRange[] findRangeGroup(
             @PathVariable("service") String service,
