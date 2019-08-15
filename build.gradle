@@ -84,6 +84,23 @@ ext {
     feignVersion = '10.2.3'
 }
 
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['Main']
+    publish = true
+    pkg {
+        repo = 'hmcts-maven'
+        name = 'fees-client'
+        userOrg = 'hmcts'
+        licenses = ['MIT']
+        vcsUrl = gitRepo
+        version {
+            name = project.version
+        }
+    }
+}
+
 def versions = [
     logback           : '1.2.3',
     springBoot        : springBootVersion,
