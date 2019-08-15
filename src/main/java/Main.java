@@ -59,4 +59,8 @@ public class Main {
         System.err.println("\tfee {domain} {service} {jurisdiction1} {jurisdiction2} {channel} {eventType} {amount}");
         System.err.println("\tranges {domain} {service} {jurisdiction1} {jurisdiction2} {channel} {eventType}");
     }
+
+    private Main() {
+        // no op
+    }
 }

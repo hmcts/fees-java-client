@@ -51,13 +51,13 @@ class FeeVersionSubDeserializerTest {
         FeeVersion version = parseAndDeserialize("{\"valid_from\":\"2014-04-22T00:00:00.000+0000\"}");
         OffsetDateTime actual = version.getValidFrom();
         assertAll(
-                () -> assertEquals(2014, actual.getYear()),
-                () -> assertEquals(Month.APRIL, actual.getMonth()),
-                () -> assertEquals(22, actual.getDayOfMonth()),
-                () -> assertEquals(0, actual.getHour()),
-                () -> assertEquals(0, actual.getMinute()),
-                () -> assertEquals(0, actual.getSecond()),
-                () -> assertEquals(ZoneOffset.UTC, actual.getOffset())
+            () -> assertEquals(2014, actual.getYear()),
+            () -> assertEquals(Month.APRIL, actual.getMonth()),
+            () -> assertEquals(22, actual.getDayOfMonth()),
+            () -> assertEquals(0, actual.getHour()),
+            () -> assertEquals(0, actual.getMinute()),
+            () -> assertEquals(0, actual.getSecond()),
+            () -> assertEquals(ZoneOffset.UTC, actual.getOffset())
         );
     }
 

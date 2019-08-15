@@ -11,9 +11,9 @@ class DeserializationUtils {
         // no op
     }
 
-    static <FIELD> void extractNode(
-            Consumer<FIELD> setter,
-            Function<JsonNode, FIELD> nodeToValue,
+    static <T> void extractNode(
+            Consumer<T> setter,
+            Function<JsonNode, T> nodeToValue,
             JsonNode node,
             String... children
     ) {
