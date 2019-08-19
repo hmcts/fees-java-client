@@ -112,6 +112,8 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+
     compile group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
     compile group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformJavaLogging
