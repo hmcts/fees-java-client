@@ -1,9 +1,8 @@
-package uk.gov.hmcts.reform.fees.client;
+package uk.gov.hmcts.reform.fees.client.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Data
@@ -13,8 +12,9 @@ public class FeeVersion {
     private String status;
     private Integer version;
     private OffsetDateTime validFrom;
-    private BigDecimal amount;
+    private FlatAmount flatAmount;
     private String memoLine;
+    private String statutoryInstrument;
     private String naturalAccountCode;
     private String direction;
 }

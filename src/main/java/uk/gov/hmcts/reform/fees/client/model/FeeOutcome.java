@@ -1,7 +1,6 @@
-package uk.gov.hmcts.reform.fees.client;
+package uk.gov.hmcts.reform.fees.client.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,7 +10,6 @@ import java.math.BigDecimal;
 public class FeeOutcome {
     private String code;
     private String description;
-    @JsonProperty("fee_amount")
-    private BigDecimal amount;
+    private BigDecimal feeAmount;
     private String version;
 }
