@@ -127,6 +127,20 @@ dependencies {
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
 }
 
+def pomConfig = {
+    licenses {
+        license {
+            name "MIT License"
+            url "http://www.opensource.org/licenses/mit-license.php"
+            distribution "repo"
+        }
+    }
+
+    scm {
+        url "https://github.com/hmcts/fees-java-client"
+    }
+}
+
 publishing {
     publications {
         Main(MavenPublication) {
@@ -139,11 +153,28 @@ publishing {
 
             pom.withXml {
                 def root = asNode()
-                root.appendNode('description', 'Fees client')
-                root.appendNode('name', 'Fees client')
-                root.appendNode('url', gitRepo)
+                root.appendNode('description', 'Client library for communicating with fees api')
+                root.appendNode('name', 'Fees java client')
+                root.appendNode('url', 'https://github.com/hmcts/fees-java-client')
                 root.children().last() + pomConfig
             }
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['Main']
+    publish = true
+    pkg {
+        repo = 'hmcts-maven'
+        name = 'fees-client'
+        userOrg = 'hmcts'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/hmcts/fees-java-client'
+        version {
+            name = project.version
         }
     }
 }
@@ -156,8 +187,8 @@ jar {
     enabled = true
     manifest {
         attributes(
-            'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-            'Main-Class': 'Main'
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': 'Main'
         )
     }
 }
