@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest(classes = {FeesClientAutoConfiguration.class, FeesClient.class, FeesApi.class})
+@SpringBootTest(classes = {FeesClient.class, FeesApi.class})
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @AutoConfigureWireMock(port = 8091)
