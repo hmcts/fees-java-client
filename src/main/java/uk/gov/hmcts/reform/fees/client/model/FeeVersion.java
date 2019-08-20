@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.fees.client.model;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
 
 @Data
+@Builder
 public class FeeVersion {
     private String description;
     private String status;
