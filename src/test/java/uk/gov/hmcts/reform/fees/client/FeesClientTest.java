@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest(classes = {FeesClient.class, FeesApi.class})
+@SpringBootTest(classes = {FeesClient.class, FeesApi.class, CoreFeignConfiguration.class})
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @AutoConfigureWireMock(port = 8091)
@@ -26,6 +26,7 @@ class FeesClientTest {
 
     @Test
     void successfullyRetrieveFee() {
+        // request should match src/test/resources/mappings/fees-lookup-successful.json
         FeeOutcome fee = feesClient.lookupFee("test channel", "test event", BigDecimal.valueOf(1000.0));
         assertAll(
             () -> assertThat(fee.getFeeAmount()).isEqualTo("60.00"),
@@ -37,6 +38,7 @@ class FeesClientTest {
 
     @Test
     void successfullyFindRangeGroups() {
+        // request should match src/test/resources/mappings/find-ranges-successful.json
         FeeRange[] ranges = feesClient.findRangeGroup("test channel", "test event");
         assertAll(
             () -> assertThat(ranges).hasSize(2),
