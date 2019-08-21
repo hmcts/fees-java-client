@@ -101,6 +101,26 @@ dependencyManagement {
     }
 }
 
+sourceSets {
+    functionalTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    functionalTestImplementation.extendsFrom testImplementation
+    functionalTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+task functionalTest(type: Test) {
+    description = 'Runs functional tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+}
+
 dependencies {
     api group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     api group: 'io.github.openfeign', name: 'feign-jackson', version: feignVersion
@@ -125,6 +145,9 @@ dependencies {
 
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.24.1'
     testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
+
+    functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 }
 
 def pomConfig = {
