@@ -1,0 +1,18 @@
+{
+  "id" : "b55ec4a3-8775-44d5-8d50-59db93ff9a3a",
+  "name" : "health_liveness",
+  "request" : {
+    "url" : "/health/liveness",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"status\":\"UP\"}",
+    "headers" : {
+      "Content-Type" : "application/vnd.spring-boot.actuator.v2+json;charset=UTF-8",
+      "Date" : "Wed, 28 Aug 2019 10:16:17 GMT"
+    }
+  },
+  "uuid" : "b55ec4a3-8775-44d5-8d50-59db93ff9a3a",
+  "persistent" : true
+}
