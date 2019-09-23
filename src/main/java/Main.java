@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import org.springframework.boot.actuate.health.Health;
@@ -9,11 +10,16 @@ import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 
 @SpringBootApplication
 @EnableFeignClients
 public class Main {
     public static void main(String[] args) {
+        if (args == null || args.length == 0) {
+            printUsage();
+            System.exit(0);
+        }
         if ("health".equalsIgnoreCase(args[0])) {
             checkHealth(args);
         } else if ("fee".equalsIgnoreCase(args[0])) {
@@ -60,7 +66,7 @@ public class Main {
     private static FeesApi createFeesFeignClient(String domain) {
         return Feign.builder()
                 .contract(new SpringMvcContract())
-                .decoder(new JacksonDecoder())
+                .decoder(new JacksonDecoder(Collections.singleton(new JavaTimeModule())))
                 .target(FeesApi.class, domain);
     }
 
