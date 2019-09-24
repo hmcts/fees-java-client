@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
+import java.math.BigDecimal;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,14 +16,6 @@ import java.time.OffsetDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FeeVersion {
-    private String description;
-    private String status;
-    private Integer version;
-    private OffsetDateTime validFrom;
-    private FlatAmount flatAmount;
-    private String memoLine;
-    private String statutoryInstrument;
-    private String naturalAccountCode;
-    private String direction;
+public class PercentageAmountDto {
+    private BigDecimal percentage;
 }

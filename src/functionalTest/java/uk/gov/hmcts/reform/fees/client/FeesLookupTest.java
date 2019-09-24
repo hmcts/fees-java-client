@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.fees.client.model.FeeOutcome;
+import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 
@@ -19,7 +19,7 @@ class FeesLookupTest extends BaseTest {
     @Test
     @DisplayName("should retrieve the correct code for an amount")
     void testValidRequest() {
-        FeeOutcome feeOutcome = feesClient.lookupFee("online", "issue", BigDecimal.valueOf(100));
+        FeeLookupResponseDto feeOutcome = feesClient.lookupFee("online", "issue", BigDecimal.valueOf(100));
         assertEquals("FEE0211", feeOutcome.getCode());
     }
 

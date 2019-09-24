@@ -17,20 +17,21 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FeeRange {
+public class Fee2Dto {
+    private ApplicantTypeDto applicantType;
+    private ChannelTypeDto channelType;
     private String code;
+    private FeeVersionDto currentVersion;
+    private EventTypeDto eventType;
     private String feeType;
-    private ChannelType channelType;
-    private EventType eventType;
-    private Jurisdiction1 jurisdiction1;
-    private Jurisdiction2 jurisdiction2;
-    private ServiceType serviceType;
-    private ApplicantType applicantType;
-    private List<FeeVersion> feeVersions;
-    private FeeVersion currentVersion;
-    private BigDecimal minRange;
+    private List<FeeVersionDto> feeVersions;
+    private Jurisdiction1Dto jurisdiction1;
+    private Jurisdiction2Dto jurisdiction2;
+    private String keyword;
+    private FeeVersionDto matchingVersion;
     private BigDecimal maxRange;
+    private BigDecimal minRange;
     private String rangeUnit;
+    private ServiceTypeDto serviceType;
     private Boolean unspecifiedClaimAmount;
-    private FeeVersion matchingVersion;
 }

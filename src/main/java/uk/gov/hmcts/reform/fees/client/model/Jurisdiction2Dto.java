@@ -8,17 +8,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FeeOutcome {
-    private String code;
-    private String description;
-    private BigDecimal feeAmount;
-    private String version;
+public class Jurisdiction2Dto {
+    private String name;
 }

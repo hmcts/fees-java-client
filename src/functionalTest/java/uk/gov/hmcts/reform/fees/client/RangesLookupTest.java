@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.fees.client.model.FeeRange;
+import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,10 +19,10 @@ class RangesLookupTest extends BaseTest {
     @Test
     @DisplayName("should retrieve a range of fees for a valid request")
     void testValidRequest() {
-        FeeRange[] ranges = feesClient.findRangeGroup("default", "issue");
+        Fee2Dto[] ranges = feesClient.findRangeGroup("default", "issue");
         assertNotNull(ranges);
         assertTrue(ranges.length > 0);
-        for (FeeRange range : ranges) {
+        for (Fee2Dto range : ranges) {
             assertEquals("default", range.getChannelType().getName());
             assertEquals("issue", range.getEventType().getName());
         }

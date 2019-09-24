@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Jurisdiction2 {
+public class Jurisdiction1Dto {
     private String name;
 }

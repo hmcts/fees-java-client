@@ -11,9 +11,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.fees.client.model.FeeOutcome;
-import uk.gov.hmcts.reform.fees.client.model.FeeRange;
-import uk.gov.hmcts.reform.fees.client.model.FeeVersion;
+import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
+import uk.gov.hmcts.reform.fees.client.model.FeeVersionDto;
 
 import java.math.BigDecimal;
 
@@ -36,19 +36,19 @@ class FeesClientTest {
     @Test
     void successfullyRetrieveFee() {
         // request should match src/test/resources/mappings/fees-lookup-successful.json
-        FeeOutcome fee = feesClient.lookupFee("test channel", "test event", BigDecimal.valueOf(1000.0));
+        FeeLookupResponseDto fee = feesClient.lookupFee("test channel", "test event", BigDecimal.valueOf(1000.0));
         assertAll(
             () -> assertThat(fee.getFeeAmount()).isEqualTo("60.00"),
             () -> assertThat(fee.getCode()).isEqualTo("FEE123"),
             () -> assertThat(fee.getDescription()).isEqualTo("Test service fees - Amount - 500.01 upto 1000 GBP"),
-            () -> assertThat(fee.getVersion()).isEqualTo("3")
+            () -> assertThat(fee.getVersion()).isEqualTo(3)
         );
     }
 
     @Test
     void successfullyFindRangeGroups() {
         // request should match src/test/resources/mappings/find-ranges-successful.json
-        FeeRange[] ranges = feesClient.findRangeGroup("test channel", "test event");
+        Fee2Dto[] ranges = feesClient.findRangeGroup("test channel", "test event");
         assertAll(
             () -> assertThat(ranges).hasSize(2),
 
@@ -97,7 +97,7 @@ class FeesClientTest {
     }
 
     private void assertFeeVersionMatches(
-            FeeVersion result,
+            FeeVersionDto result,
             String description,
             String status,
             int version,
