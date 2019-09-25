@@ -205,13 +205,3 @@ bintray {
 bootJar {
     enabled = false
 }
-
-jar {
-    enabled = true
-    manifest {
-        attributes(
-                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-                'Main-Class': 'Main'
-        )
-    }
-}
