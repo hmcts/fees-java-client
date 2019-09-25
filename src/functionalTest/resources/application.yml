@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: 'Fees service client'
+
+fees:
+  api:
+    url: 'http://localhost:4182'
+    service: 'civil money claims'
+    jurisdiction1: 'civil'
+    jurisdiction2: 'county court'
+
+feign:
+  httpclient:
+    enabled: true
+  client:
+    config:
+      default:
+        loggerLevel: 'full'

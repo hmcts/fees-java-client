@@ -1,0 +1,7 @@
+---
+fees:
+  api:
+    url: 'http://localhost:${wiremock.server.port}'
+    service: 'test service'
+    jurisdiction1: 'test jurisdiction1'
+    jurisdiction2: 'test jurisdiction2'

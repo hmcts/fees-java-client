@@ -2,9 +2,11 @@ plugins {
     id 'checkstyle'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'org.springframework.boot' version '2.1.7.RELEASE'
-    id 'com.jfrog.bintray' version '1.8.4'
     id 'com.github.ben-manes.versions' version '0.22.0'
+    id 'com.jfrog.bintray' version '1.8.4'
     id 'java-library'
+    id 'maven'
+    id 'maven-publish'
     id 'net.ltgt.apt' version '0.21'
 }
 
@@ -79,6 +81,110 @@ test {
     useJUnitPlatform()
 }
 
+ext {
+    lombokVersion = '1.18.8'
+    springCloudVersion = 'Greenwich.SR2'
+    feignVersion = '10.2.3'
+}
+
+def versions = [
+    logback           : '1.2.3',
+    springBoot        : springBootVersion,
+    springfoxSwagger  : '2.9.2',
+    reformJavaLogging : '5.0.1',
+    junitJupiter      : '5.5.1'
+]
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+sourceSets {
+    functionalTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    functionalTestImplementation.extendsFrom testImplementation
+    functionalTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+task functionalTest(type: Test) {
+    description = 'Runs functional tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+}
+
+dependencies {
+    api group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
+    api group: 'io.github.openfeign', name: 'feign-jackson', version: feignVersion
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.9'
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
+    compile group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformJavaLogging
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: versions.junitJupiter
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+
+    testImplementation 'ru.lanwen.wiremock:wiremock-junit5:1.3.0'
+
+    testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.24.1'
+    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
+
+    functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "MIT License"
+            url "http://www.opensource.org/licenses/mit-license.php"
+            distribution "repo"
+        }
+    }
+
+    scm {
+        url "https://github.com/hmcts/fees-java-client"
+    }
+}
+
+publishing {
+    publications {
+        Main(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId project.group
+            artifactId 'fees-client'
+            version project.version
+
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Client library for communicating with fees api')
+                root.appendNode('name', 'Fees java client')
+                root.appendNode('url', 'https://github.com/hmcts/fees-java-client')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
 bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
@@ -89,30 +195,11 @@ bintray {
         name = 'fees-client'
         userOrg = 'hmcts'
         licenses = ['MIT']
-        vcsUrl = gitRepo
+        vcsUrl = 'https://github.com/hmcts/fees-java-client'
         version {
             name = project.version
         }
     }
-}
-
-def versions = [
-        logback           : '1.2.3',
-        springBoot        : springBootVersion,
-        springfoxSwagger  : '2.9.2',
-        reformJavaLogging : '5.0.1'
-]
-
-dependencies {
-    compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
-
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
-    compile group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformJavaLogging
-
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.1'
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.1'
 }
 
 bootJar {
