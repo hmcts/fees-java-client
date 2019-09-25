@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
@@ -8,8 +9,8 @@ import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import uk.gov.hmcts.reform.fees.client.FeesApi;
 import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Collections;
 
 @SpringBootApplication
@@ -40,7 +41,7 @@ public class Main {
 
         FeesHealthIndicator client = new FeesHealthIndicator(args[1]);
         Health health = client.health();
-        System.out.println(health);
+        printPrettified(health);
     }
 
     private static void requestFee(String[] args) {
@@ -50,7 +51,7 @@ public class Main {
         }
 
         FeesApi feesApi = createFeesFeignClient(args[1]);
-        System.out.println(feesApi.lookupFee(args[2], args[3], args[4], args[5], args[6], new BigDecimal(args[7])));
+        printPrettified(feesApi.lookupFee(args[2], args[3], args[4], args[5], args[6], new BigDecimal(args[7])));
     }
 
     private static void requestRanges(String[] args) {
@@ -60,7 +61,7 @@ public class Main {
         }
 
         FeesApi feesApi = createFeesFeignClient(args[1]);
-        System.out.println(Arrays.toString(feesApi.findRangeGroup(args[2], args[3], args[4], args[5], args[6])));
+        printPrettified(feesApi.findRangeGroup(args[2], args[3], args[4], args[5], args[6]));
     }
 
     private static FeesApi createFeesFeignClient(String domain) {
@@ -75,6 +76,15 @@ public class Main {
         System.err.println("\thealth {domain}");
         System.err.println("\tfee {domain} {service} {jurisdiction1} {jurisdiction2} {channel} {eventType} {amount}");
         System.err.println("\tranges {domain} {service} {jurisdiction1} {jurisdiction2} {channel} {eventType}");
+    }
+
+    private static void printPrettified(Object o) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(System.out, o);
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+        }
     }
 
     private Main() {
