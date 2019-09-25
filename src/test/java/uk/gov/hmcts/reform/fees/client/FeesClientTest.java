@@ -11,8 +11,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
+import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 import uk.gov.hmcts.reform.fees.client.model.FeeVersionDto;
 
 import java.math.BigDecimal;
@@ -65,12 +65,12 @@ class FeesClientTest {
             () -> assertThat(ranges[0].getServiceType().getName()).isEqualTo("test service"),
             () -> assertThat(ranges[0].getUnspecifiedClaimAmount()).isFalse(),
             () -> assertFeeVersionMatches(ranges[0].getCurrentVersion(),
-                    "Test service fees - Amount - 3000.01 up to 5000 GBP",
-                    "approved",
-                    3,
-                    "2015-03-09T00:00Z",
-                    205.0,
-                    "Test fees £3,000-5,000"),
+                "Test service fees - Amount - 3000.01 up to 5000 GBP",
+                "approved",
+                3,
+                "2015-03-09T00:00Z",
+                205.0,
+                "Test fees £3,000-5,000"),
             () -> assertThat(ranges[0].getMatchingVersion()).isEqualTo(ranges[0].getCurrentVersion()),
 
             () -> assertThat(ranges[1].getApplicantType().getName()).isEqualTo("all"),
@@ -86,24 +86,24 @@ class FeesClientTest {
             () -> assertThat(ranges[1].getServiceType().getName()).isEqualTo("test service"),
             () -> assertThat(ranges[1].getUnspecifiedClaimAmount()).isFalse(),
             () -> assertFeeVersionMatches(ranges[1].getCurrentVersion(),
-                    "Test service fees - Amount - 0.01 up to 200 GBP.",
-                    "approved",
-                    1,
-                    "2015-03-09T00:00Z",
-                    5.0,
-                    "Test fees £0.01-200"),
+                "Test service fees - Amount - 0.01 up to 200 GBP.",
+                "approved",
+                1,
+                "2015-03-09T00:00Z",
+                5.0,
+                "Test fees £0.01-200"),
             () -> assertThat(ranges[1].getMatchingVersion()).isEqualTo(ranges[1].getCurrentVersion())
         );
     }
 
     private void assertFeeVersionMatches(
-            FeeVersionDto result,
-            String description,
-            String status,
-            int version,
-            String validFrom,
-            double amount,
-            String memoLine
+        FeeVersionDto result,
+        String description,
+        String status,
+        int version,
+        String validFrom,
+        double amount,
+        String memoLine
     ) {
         assertAll(
             () -> assertThat(result.getDescription()).isEqualTo(description),
@@ -118,7 +118,8 @@ class FeesClientTest {
     @Nested
     @DisplayName("Propagation")
     class Propagation {
-        @Mock private FeesApi feesApi;
+        @Mock
+        private FeesApi feesApi;
 
         @BeforeEach
         void replaceFeesClient() {
