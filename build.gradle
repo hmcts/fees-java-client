@@ -11,7 +11,7 @@ plugins {
 }
 
 group 'uk.gov.hmcts.reform'
-version '0.0.1'
+version '0.0.2'
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -30,7 +30,7 @@ def springBootVersion = '2.1.6.RELEASE'
 
 checkstyle {
     maxWarnings = 0
-    toolVersion = '8.22'
+    toolVersion = '8.24'
 }
 
 sourceCompatibility = 1.8
@@ -90,7 +90,6 @@ ext {
 def versions = [
     logback           : '1.2.3',
     springBoot        : springBootVersion,
-    springfoxSwagger  : '2.9.2',
     reformJavaLogging : '5.0.1',
     junitJupiter      : '5.5.1'
 ]
@@ -128,9 +127,6 @@ dependencies {
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
-
-    compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
 
@@ -178,7 +174,7 @@ publishing {
                 def root = asNode()
                 root.appendNode('description', 'Client library for communicating with fees api')
                 root.appendNode('name', 'Fees java client')
-                root.appendNode('url', 'https://github.com/hmcts/fees-java-client')
+                root.appendNode('url', gitRepo)
                 root.children().last() + pomConfig
             }
         }
@@ -195,7 +191,7 @@ bintray {
         name = 'fees-client'
         userOrg = 'hmcts'
         licenses = ['MIT']
-        vcsUrl = 'https://github.com/hmcts/fees-java-client'
+        vcsUrl = gitRepo
         version {
             name = project.version
         }
