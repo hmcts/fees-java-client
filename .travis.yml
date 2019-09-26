@@ -8,6 +8,13 @@ cache:
   directories:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
+deploy:
+  - provider: script
+    script: "./gradlew bintrayUpload"
+    skip_cleanup: true
+    on:
+      repo: hmcts/fees-java-client
+      tags: true
 env:
   global:
   - secure: nut7rSP8NJ4+QifZfmCXSJfqJhMXXFenEoGq96Uf9Ltz5XqCqGTduR+9FDeWEvMFY56dmuenzTKAIk4LmFWiul7s6XDAkZXOul83MEDliNCW94jIVoY0dR0NsKQEvOifqj58UCY2XpJQ+kR3RMyK/HevOA4FAhyJhqPOiGG70XwxxbKJNyTcaQbZRkXXzN9/4kU6mjaU+je+vDZNsXWTEqzthp7TOt5mdpyQBsyVHW0l2wKzwyWHcIx5w0OrI9BYhCKRHnX2Q5sm4PeFRL6A/PVs5iU9LfUIi5oHoP/2Jo+67OadZpwFtO/Rs6quWs+1R+OGJXw9DtV9GStp7yI6eBB2E/x75Y/1ovPRkpuz2+ZATu6oy+9GIIsYZ/dOKhGJo8DIT42iipcGBNxu4IaWygpJ5+VDniPlOxNgEr26Zlj/opJpUbn1UrMaGl30lTYlRqsia1tOSsGm8RKEEXjIQPGa5psdTM/h6dSmbaqLHKlhQK1zTobjDmW/ceHAnuW0JbiXHYeKfvOpOG4J6SD5+gEcA9TR7Wv/qAxEIjL3xnXHrTQ3IEpjQbM6lhpGMxaX3dWz1vjisUoZyQEM87Ur/+93ce0qtG8RzT3Epuq/W3kUZ1HZZjDRoUu2Nw3vRG2RwvnaUpLv/mbSa01vMnTekkTIJrJU7PlJSXJTFTbV4BE=
