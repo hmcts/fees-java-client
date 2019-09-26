@@ -26,11 +26,11 @@ class FeesService {
         this.feesClient = feesClient;
     }
     
-    public FeeOutcome lookupFee(String channel, String event, BigDecimal amount) {
+    public FeeLookupResponseDto lookupFee(String channel, String event, BigDecimal amount) {
         return feesClient.lookupFee(channel, event, amount);
     }
 
-    public FeeRange[] findRangeGroup(String channel, String event) {
+    public Fee2Dto[] findRangeGroup(String channel, String event) {
         return feesClient.findRangeGroup(channel, event);
     }
 }
