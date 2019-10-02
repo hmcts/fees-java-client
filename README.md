@@ -1,7 +1,7 @@
 # Fees Java Client
 
 [![Build Status](https://travis-ci.com/hmcts/fees-java-client.svg?branch=master)](https://travis-ci.com/hmcts/fees-java-client)
-[ ![Download](https://api.bintray.com/packages/hmcts/hmcts-maven/fees-client/images/download.svg) ](https://bintray.com/hmcts/hmcts-maven/fees-client/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/hmcts/hmcts-maven/fees-java-client/images/download.svg) ](https://bintray.com/hmcts/hmcts-maven/fees-java-client/_latestVersion)
 
 This is a client library for interacting with the Fees application.
 
