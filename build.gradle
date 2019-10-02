@@ -167,7 +167,7 @@ publishing {
             artifact sourcesJar
             artifact javadocJar
             groupId project.group
-            artifactId 'fees-client'
+            artifactId 'fees-java-client'
             version project.version
 
             pom.withXml {
@@ -188,7 +188,7 @@ bintray {
     publish = true
     pkg {
         repo = 'hmcts-maven'
-        name = 'fees-client'
+        name = 'fees-java-client'
         userOrg = 'hmcts'
         licenses = ['MIT']
         vcsUrl = gitRepo
