@@ -10,8 +10,11 @@ plugins {
     id 'net.ltgt.apt' version '0.21'
 }
 
+def buildNumber = System.getenv("RELEASE_VERSION")?.replace("refs/tags/", "") ?: "DEV-SNAPSHOT"
+
 group 'uk.gov.hmcts.reform'
-version '0.0.3'
+// This will pick up the version number from release tag
+version buildNumber
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
