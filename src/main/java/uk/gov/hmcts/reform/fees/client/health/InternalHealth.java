@@ -6,7 +6,7 @@ import org.springframework.boot.actuate.health.Status;
 
 import java.util.Map;
 
-class InternalHealth {
+public class InternalHealth {
     private final Status status;
     private final Map<String, Object> details;
 

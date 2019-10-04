@@ -1,46 +1,27 @@
 package uk.gov.hmcts.reform.fees.client.health;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.fees.client.FeesApi;
 
-import java.util.Collections;
-
-@Component
 public class FeesHealthIndicator implements HealthIndicator {
-    private String healthEndpoint;
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeesHealthIndicator.class);
 
-    @Autowired
-    public FeesHealthIndicator(@Value("${fees.api.url}") String feesDomain) {
-        healthEndpoint = feesDomain + "/health/liveness";
+    private final FeesApi feesApi;
+
+    public FeesHealthIndicator(final FeesApi feesApi) {
+        this.feesApi = feesApi;
     }
 
     @Override
     public Health health() {
         try {
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON_UTF8));
-
-            HttpEntity<?> entity = new HttpEntity<Object>("", httpHeaders);
-
-            ResponseEntity<InternalHealth> exchange = new RestTemplate().exchange(
-                    healthEndpoint,
-                    HttpMethod.GET,
-                    entity,
-                    InternalHealth.class);
-
-            InternalHealth body = exchange.getBody();
-
-            return new Health.Builder(body.getStatus()).build();
+            InternalHealth internalHealth = this.feesApi.health();
+            return new Health.Builder(internalHealth.getStatus()).build();
         } catch (Exception ex) {
+            LOGGER.error("Error on fees client healthcheck", ex);
             return Health.down(ex).build();
         }
     }
