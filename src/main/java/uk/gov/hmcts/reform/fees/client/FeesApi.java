@@ -3,13 +3,17 @@ package uk.gov.hmcts.reform.fees.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import uk.gov.hmcts.reform.fees.client.health.InternalHealth;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 
-@FeignClient(name = "fees-api", url = "${fees.api.url}", configuration = CoreFeignConfiguration.class)
+@FeignClient(name = "fees-api", url = "${fees.api.url}")
 public interface FeesApi {
+    @GetMapping("/health")
+    InternalHealth health();
+
     @GetMapping("/fees-register/fees/lookup"
         + "?service={service}"
         + "&jurisdiction1={jurisdiction1}"

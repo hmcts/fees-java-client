@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.fees.client.config.FeesClientAutoConfiguration;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 import uk.gov.hmcts.reform.fees.client.model.FeeVersionDto;
@@ -25,7 +26,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {FeesClient.class, FeesApi.class, CoreFeignConfiguration.class})
+@SpringBootTest(classes = {FeesClient.class, FeesApi.class, FeesClientAutoConfiguration.class})
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @AutoConfigureWireMock(port = 8091)
