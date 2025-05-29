@@ -3,7 +3,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'org.springframework.boot' version '2.1.7.RELEASE'
     id 'com.github.ben-manes.versions' version '0.22.0'
-    id 'com.jfrog.bintray' version '1.8.4'
     id 'java-library'
     id 'maven'
     id 'maven-publish'
@@ -12,7 +11,7 @@ plugins {
 
 def buildNumber = System.getenv("RELEASE_VERSION")?.replace("refs/tags/", "") ?: "DEV-SNAPSHOT"
 
-group 'uk.gov.hmcts.reform'
+group 'com.github.hmcts'
 // This will pick up the version number from release tag
 version buildNumber
 
@@ -48,7 +47,8 @@ compileTestJava {
 
 repositories {
     mavenLocal()
-    jcenter()
+    mavenCentral()
+    maven { url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1' }
 }
 
 jar {
@@ -120,7 +120,7 @@ dependencies {
 
     compile group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
     compile group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformJavaLogging
+    compile group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformJavaLogging
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: versions.junitJupiter
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
@@ -171,7 +171,7 @@ publishing {
             artifact javadocJar
             groupId project.group
             artifactId 'fees-java-client'
-            version project.version
+            version '0.0.6'
 
             pom.withXml {
                 def root = asNode()
@@ -182,24 +182,18 @@ publishing {
             }
         }
     }
-}
-
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
-    publications = ['Main']
-    publish = true
-    pkg {
-        repo = 'hmcts-maven'
-        name = 'fees-java-client'
-        userOrg = 'hmcts'
-        licenses = ['MIT']
-        vcsUrl = gitRepo
-        version {
-            name = project.version
+    repositories {
+        maven {
+            name = "AzureArtifacts"
+            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+            credentials {
+                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+            }
         }
     }
 }
+
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
