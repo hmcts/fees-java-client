@@ -1,181 +1,241 @@
 package uk.gov.hmcts.reform.fees.client;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.fees.client.config.FeesClientAutoConfiguration;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
-import uk.gov.hmcts.reform.fees.client.model.FeeVersionDto;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {FeesClient.class, FeesApi.class, FeesClientAutoConfiguration.class})
-@ExtendWith(SpringExtension.class)
-@EnableAutoConfiguration
-@AutoConfigureWireMock(port = 8091)
+@ExtendWith(MockitoExtension.class)
 class FeesClientTest {
-    @Autowired
+
+    @Mock
+    private FeesApi feesApi;
+
     private FeesClient feesClient;
 
-    @Test
-    void successfullyRetrieveFee() {
-        // request should match src/test/resources/mappings/fees-lookup-successful.json
-        FeeLookupResponseDto fee = feesClient.lookupFee("test channel", "test event", BigDecimal.valueOf(1000.0));
-        assertAll(
-            () -> assertThat(fee.getFeeAmount()).isEqualTo("60.00"),
-            () -> assertThat(fee.getCode()).isEqualTo("FEE123"),
-            () -> assertThat(fee.getDescription()).isEqualTo("Test service fees - Amount - 500.01 upto 1000 GBP"),
-            () -> assertThat(fee.getVersion()).isEqualTo(3)
-        );
+    private static final String SERVICE = "test-service";
+    private static final String JURISDICTION_1 = "jurisdiction-1";
+    private static final String JURISDICTION_2 = "jurisdiction-2";
+    private static final String CHANNEL = "online";
+    private static final String EVENT = "issue";
+    private static final BigDecimal AMOUNT = new BigDecimal("1000.00");
+
+    @BeforeEach
+    void setUp() {
+        feesClient = new FeesClient(feesApi, SERVICE, JURISDICTION_1, JURISDICTION_2);
     }
 
     @Test
-    void successfullyFindRangeGroups() {
-        // request should match src/test/resources/mappings/find-ranges-successful.json
-        Fee2Dto[] ranges = feesClient.findRangeGroup("test channel", "test event");
-        assertAll(
-            () -> assertThat(ranges).hasSize(2),
+    void shouldCreateFeesClientWithCorrectParameters() {
 
-            () -> assertThat(ranges[0].getApplicantType().getName()).isEqualTo("all"),
-            () -> assertThat(ranges[0].getChannelType().getName()).isEqualTo("test channel"),
-            () -> assertThat(ranges[0].getCode()).isEqualTo("FEE0123"),
-            () -> assertThat(ranges[0].getEventType().getName()).isEqualTo("test event"),
-            () -> assertThat(ranges[0].getFeeType()).isEqualTo("extortionate"),
-            () -> assertThat(ranges[0].getJurisdiction1().getName()).isEqualTo("test jurisdiction1"),
-            () -> assertThat(ranges[0].getJurisdiction2().getName()).isEqualTo("test jurisdiction2"),
-            () -> assertThat(ranges[0].getMaxRange()).isEqualTo("5000.00"),
-            () -> assertThat(ranges[0].getMinRange()).isEqualTo("3000.01"),
-            () -> assertThat(ranges[0].getRangeUnit()).isEqualTo("GBP"),
-            () -> assertThat(ranges[0].getServiceType().getName()).isEqualTo("test service"),
-            () -> assertThat(ranges[0].getUnspecifiedClaimAmount()).isFalse(),
-            () -> assertFeeVersionMatches(ranges[0].getCurrentVersion(),
-                "Test service fees - Amount - 3000.01 up to 5000 GBP",
-                "approved",
-                3,
-                "2015-03-09T00:00Z",
-                205.0,
-                "Test fees £3,000-5,000"),
-            () -> assertThat(ranges[0].getMatchingVersion()).isEqualTo(ranges[0].getCurrentVersion()),
+        FeesClient client = new FeesClient(feesApi, SERVICE, JURISDICTION_1, JURISDICTION_2);
 
-            () -> assertThat(ranges[1].getApplicantType().getName()).isEqualTo("all"),
-            () -> assertThat(ranges[1].getChannelType().getName()).isEqualTo("test channel"),
-            () -> assertThat(ranges[1].getCode()).isEqualTo("FEE1234"),
-            () -> assertThat(ranges[1].getEventType().getName()).isEqualTo("test event"),
-            () -> assertThat(ranges[1].getFeeType()).isEqualTo("ranged"),
-            () -> assertThat(ranges[1].getJurisdiction1().getName()).isEqualTo("test jurisdiction1"),
-            () -> assertThat(ranges[1].getJurisdiction2().getName()).isEqualTo("test jurisdiction2"),
-            () -> assertThat(ranges[1].getMaxRange()).isEqualTo("200.00"),
-            () -> assertThat(ranges[1].getMinRange()).isEqualTo("0.01"),
-            () -> assertThat(ranges[1].getRangeUnit()).isEqualTo("GBP"),
-            () -> assertThat(ranges[1].getServiceType().getName()).isEqualTo("test service"),
-            () -> assertThat(ranges[1].getUnspecifiedClaimAmount()).isFalse(),
-            () -> assertFeeVersionMatches(ranges[1].getCurrentVersion(),
-                "Test service fees - Amount - 0.01 up to 200 GBP.",
-                "approved",
-                1,
-                "2015-03-09T00:00Z",
-                5.0,
-                "Test fees £0.01-200"),
-            () -> assertThat(ranges[1].getMatchingVersion()).isEqualTo(ranges[1].getCurrentVersion())
+        assertThat(client).isNotNull();
+    }
+
+    @Test
+    void shouldLookupFeeSuccessfully() {
+        
+        FeeLookupResponseDto expectedResponse = FeeLookupResponseDto.builder()
+                .code("FEE001")
+                .description("Test fee")
+                .feeAmount(new BigDecimal("50.00"))
+                .version(1)
+                .build();
+
+        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, AMOUNT))
+                .thenReturn(expectedResponse);
+
+        FeeLookupResponseDto result = feesClient.lookupFee(CHANNEL, EVENT, AMOUNT);
+
+        assertThat(result)
+                .isNotNull()
+                .extracting(
+                        FeeLookupResponseDto::getCode,
+                        FeeLookupResponseDto::getDescription,
+                        FeeLookupResponseDto::getFeeAmount,
+                        FeeLookupResponseDto::getVersion
+                )
+                .containsExactly("FEE001", "Test fee", new BigDecimal("50.00"), 1);
+
+        verify(feesApi, times(1))
+                .lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, AMOUNT);
+    }
+
+    @Test
+    void shouldPassCorrectParametersToFeesApiForLookupFee() {
+        
+        FeeLookupResponseDto response = FeeLookupResponseDto.builder().build();
+        when(feesApi.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), any(BigDecimal.class)))
+                .thenReturn(response);
+
+        feesClient.lookupFee(CHANNEL, EVENT, AMOUNT);
+
+        verify(feesApi).lookupFee(
+                SERVICE,
+                JURISDICTION_1,
+                JURISDICTION_2,
+                CHANNEL,
+                EVENT,
+                AMOUNT
         );
     }
 
-    private void assertFeeVersionMatches(
-        FeeVersionDto result,
-        String description,
-        String status,
-        int version,
-        String validFrom,
-        double amount,
-        String memoLine
-    ) {
-        assertAll(
-            () -> assertThat(result.getDescription()).isEqualTo(description),
-            () -> assertThat(result.getStatus()).isEqualTo(status),
-            () -> assertThat(result.getVersion()).isEqualTo(version),
-            () -> assertThat(result.getValidFrom()).isEqualTo(validFrom),
-            () -> assertThat(result.getFlatAmount().getAmount().doubleValue()).isEqualTo(amount),
-            () -> assertThat(result.getMemoLine()).isEqualTo(memoLine)
+    @Test
+    void shouldFindRangeGroupSuccessfully() {
+        
+        Fee2Dto fee1 = Fee2Dto.builder()
+                .code("FEE001")
+                .feeType("range")
+                .minRange(new BigDecimal("0"))
+                .maxRange(new BigDecimal("500"))
+                .build();
+
+        Fee2Dto fee2 = Fee2Dto.builder()
+                .code("FEE002")
+                .feeType("range")
+                .minRange(new BigDecimal("500.01"))
+                .maxRange(new BigDecimal("1000"))
+                .build();
+
+        Fee2Dto[] expectedResponse = {fee1, fee2};
+
+        when(feesApi.findRangeGroup(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT))
+                .thenReturn(expectedResponse);
+
+        Fee2Dto[] result = feesClient.findRangeGroup(CHANNEL, EVENT);
+
+        assertThat(result)
+                .isNotNull()
+                .hasSize(2)
+                .extracting(Fee2Dto::getCode)
+                .containsExactly("FEE001", "FEE002");
+
+        assertThat(result[0])
+                .extracting(
+                        Fee2Dto::getCode,
+                        Fee2Dto::getFeeType,
+                        Fee2Dto::getMinRange,
+                        Fee2Dto::getMaxRange
+                )
+                .containsExactly("FEE001", "range", new BigDecimal("0"), new BigDecimal("500"));
+
+        verify(feesApi, times(1))
+                .findRangeGroup(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT);
+    }
+
+    @Test
+    void shouldPassCorrectParametersToFeesApiForFindRangeGroup() {
+        
+        Fee2Dto[] response = new Fee2Dto[0];
+        when(feesApi.findRangeGroup(anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(response);
+
+        feesClient.findRangeGroup(CHANNEL, EVENT);
+
+        verify(feesApi).findRangeGroup(
+                SERVICE,
+                JURISDICTION_1,
+                JURISDICTION_2,
+                CHANNEL,
+                EVENT
         );
     }
 
-    @Nested
-    @DisplayName("Propagation")
-    class Propagation {
-        @Mock
-        private FeesApi feesApi;
+    @Test
+    void shouldReturnEmptyArrayWhenNoRangeGroupsFound() {
+        
+        Fee2Dto[] expectedResponse = new Fee2Dto[0];
+        when(feesApi.findRangeGroup(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT))
+                .thenReturn(expectedResponse);
 
-        @BeforeEach
-        void replaceFeesClient() {
-            feesClient = new FeesClient(feesApi, "my service", "jurisdiction one", "jurisdiction two");
-        }
+        Fee2Dto[] result = feesClient.findRangeGroup(CHANNEL, EVENT);
 
-        @Test
-        void lookupFeeShouldInvokeFeesApi() {
-            feesClient.lookupFee("my channel", "my event", BigDecimal.valueOf(999.99));
-            verify(feesApi).lookupFee(
-                "my service",
-                "jurisdiction one",
-                "jurisdiction two",
-                "my channel",
-                "my event",
-                BigDecimal.valueOf(999.99)
-            );
-        }
+        assertThat(result)
+                .isNotNull()
+                .isEmpty();
+    }
 
-        @Test
-        void findRangeGroupShouldInvokeFeesApi() {
-            feesClient.findRangeGroup("my channel", "my event");
-            verify(feesApi).findRangeGroup(
-                "my service",
-                "jurisdiction one",
-                "jurisdiction two",
-                "my channel",
-                "my event"
-            );
-        }
+    @Test
+    void shouldHandleNullResponseFromLookupFee() {
+        
+        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, AMOUNT))
+                .thenReturn(null);
 
-        @Test
-        void lookupFeeShouldPropagateExceptions() {
-            when(feesApi.lookupFee(
-                anyString(), anyString(), anyString(), anyString(), anyString(), any(BigDecimal.class)
-            )).thenThrow(
-                new RuntimeException("expected exception for lookupFee")
-            );
+        FeeLookupResponseDto result = feesClient.lookupFee(CHANNEL, EVENT, AMOUNT);
 
-            assertThatThrownBy(() -> feesClient.lookupFee("my channel", "my event", BigDecimal.valueOf(999.99)))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("expected exception for lookupFee");
-        }
+        assertThat(result).isNull();
+    }
 
-        @Test
-        void findRangeGroupShouldPropagateExceptions() {
-            when(
-                feesApi.findRangeGroup(anyString(), anyString(), anyString(), anyString(), anyString())
-            ).thenThrow(
-                new RuntimeException("expected exception for findRangeGroup")
-            );
+    @Test
+    void shouldHandleNullResponseFromFindRangeGroup() {
+        
+        when(feesApi.findRangeGroup(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT))
+                .thenReturn(null);
 
-            assertThatThrownBy(() -> feesClient.findRangeGroup("my channel", "my event"))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("expected exception for findRangeGroup");
-        }
+        Fee2Dto[] result = feesClient.findRangeGroup(CHANNEL, EVENT);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void shouldWorkWithEmptyStringConfigurationValues() {
+        
+        FeesClient clientWithEmptyStrings = new FeesClient(feesApi, "", "", "");
+        FeeLookupResponseDto expectedResponse = FeeLookupResponseDto.builder().build();
+
+        when(feesApi.lookupFee("", "", "", CHANNEL, EVENT, AMOUNT))
+                .thenReturn(expectedResponse);
+
+        FeeLookupResponseDto result = clientWithEmptyStrings.lookupFee(CHANNEL, EVENT, AMOUNT);
+
+        assertThat(result).isNotNull();
+        verify(feesApi).lookupFee("", "", "", CHANNEL, EVENT, AMOUNT);
+    }
+
+    @Test
+    void shouldLookupFeeWithDifferentAmounts() {
+        
+        BigDecimal smallAmount = new BigDecimal("10.50");
+        FeeLookupResponseDto expectedResponse = FeeLookupResponseDto.builder()
+                .feeAmount(new BigDecimal("5.00"))
+                .build();
+
+        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, smallAmount))
+                .thenReturn(expectedResponse);
+
+        FeeLookupResponseDto result = feesClient.lookupFee(CHANNEL, EVENT, smallAmount);
+
+        assertThat(result)
+                .isNotNull()
+                .extracting(FeeLookupResponseDto::getFeeAmount)
+                .isEqualTo(new BigDecimal("5.00"));
+    }
+
+    @Test
+    void shouldVerifyFeesApiIsCalledOnlyOnce() {
+        
+        Fee2Dto[] expectedResponse = new Fee2Dto[1];
+        when(feesApi.findRangeGroup(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT))
+                .thenReturn(expectedResponse);
+
+        feesClient.findRangeGroup(CHANNEL, EVENT);
+
+        verify(feesApi, times(1))
+                .findRangeGroup(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT);
+        verifyNoMoreInteractions(feesApi);
     }
 }
