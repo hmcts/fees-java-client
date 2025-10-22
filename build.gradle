@@ -105,7 +105,7 @@ tasks.register("functionalTest", Test) {
 
 dependencies {
     implementation "org.springframework.cloud:spring-cloud-starter-openfeign:4.3.0"
-    implementation 'org.apache.commons:commons-lang3:3.19.0'
+    implementation "org.apache.commons:commons-lang3:3.19.0"
     implementation "org.springframework.boot:spring-boot-starter-actuator:${springFrameworkBootVersion}"
 
     implementation "com.fasterxml.jackson.core:jackson-databind:2.18.2"

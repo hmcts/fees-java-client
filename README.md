@@ -9,7 +9,7 @@ This is a client library for interacting with the Fees application.
 
 ### Prerequisites
 
-- [JDK 8](https://www.oracle.com/java)
+- [JDK 21](https://www.oracle.com/java)
 
 ## Usage
 
