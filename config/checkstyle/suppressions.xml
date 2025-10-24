@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 
 <!DOCTYPE suppressions PUBLIC
-        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
-        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-    <!-- feign-form doesn't support remapping pojo field names, so we have to use exact names required by the API -->
-    <suppress files="ExchangeCodeRequest.java|AuthenticateUserRequest.java" checks="MemberName"/>
+    <suppress files="ExchangeCodeRequest.java" checks="MemberName"/>
+    <suppress files="AuthenticateUserRequest.java" checks="MemberName"/>
 </suppressions>
