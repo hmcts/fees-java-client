@@ -19,8 +19,16 @@ class FeesLookupTest extends BaseTest {
     @Test
     @DisplayName("should retrieve the correct code for an amount")
     void testValidRequest() {
-        FeeLookupResponseDto feeOutcome = feesClient
-                .lookupFee("online", "issue", BigDecimal.valueOf(100));
+        FeeLookupResponseDto feeOutcome = feesApi.lookupFee(
+                "civil",
+                "civil",
+                "county court",
+                "online",
+                "issue",
+                null,
+                BigDecimal.valueOf(100),
+                null
+        );
         assertEquals("FEE0211", feeOutcome.getCode());
     }
 
@@ -28,8 +36,17 @@ class FeesLookupTest extends BaseTest {
     @DisplayName("should return a 400 Bad Request for an invalid request")
     void testInvalidRequest() {
         FeignException exception = assertThrows(
-            FeignException.class,
-            () -> feesClient.lookupFee("invalid channel", "invalid event", BigDecimal.valueOf(-999.99))
+                FeignException.class,
+                () -> feesApi.lookupFee(
+                        "civil",
+                        "civil",
+                        "county court",
+                        "invalid channel",
+                        "invalid event",
+                        null,
+                        BigDecimal.valueOf(-999.99),
+                        null
+                )
         );
         assertEquals(HttpStatus.BAD_REQUEST.value(), exception.status());
     }

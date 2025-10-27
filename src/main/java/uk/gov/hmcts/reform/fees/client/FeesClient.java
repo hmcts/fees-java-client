@@ -31,7 +31,29 @@ public class FeesClient {
     }
 
     public FeeLookupResponseDto lookupFee(String channel, String event, BigDecimal amount) {
-        return this.feesApi.lookupFee(service, jurisdiction1, jurisdiction2, channel, event, amount);
+        return this.feesApi.lookupFee(
+            service,
+            jurisdiction1,
+            jurisdiction2,
+            channel,
+            event,
+            null,
+            amount,
+            null
+        );
+    }
+
+    public FeeLookupResponseDto lookupFee(String channel, String event, BigDecimal amount, String keyword) {
+        return this.feesApi.lookupFee(
+            service,
+            jurisdiction1,
+            jurisdiction2,
+            channel,
+            event,
+            null,
+            amount,
+            keyword
+        );
     }
 
     public Fee2Dto[] findRangeGroup(String channel, String event) {
