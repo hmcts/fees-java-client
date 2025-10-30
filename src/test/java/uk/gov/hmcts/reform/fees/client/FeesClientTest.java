@@ -40,15 +40,12 @@ class FeesClientTest {
 
     @Test
     void shouldCreateFeesClientWithCorrectParameters() {
-
         FeesClient client = new FeesClient(feesApi, SERVICE, JURISDICTION_1, JURISDICTION_2);
-
         assertThat(client).isNotNull();
     }
 
     @Test
     void shouldLookupFeeSuccessfully() {
-        
         FeeLookupResponseDto expectedResponse = FeeLookupResponseDto.builder()
                 .code("FEE001")
                 .description("Test fee")
@@ -56,7 +53,7 @@ class FeesClientTest {
                 .version(1)
                 .build();
 
-        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, AMOUNT))
+        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, null, AMOUNT, null))
                 .thenReturn(expectedResponse);
 
         FeeLookupResponseDto result = feesClient.lookupFee(CHANNEL, EVENT, AMOUNT);
@@ -72,15 +69,19 @@ class FeesClientTest {
                 .containsExactly("FEE001", "Test fee", new BigDecimal("50.00"), 1);
 
         verify(feesApi, times(1))
-                .lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, AMOUNT);
+                .lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, null, AMOUNT, null);
     }
 
     @Test
     void shouldPassCorrectParametersToFeesApiForLookupFee() {
-        
         FeeLookupResponseDto response = FeeLookupResponseDto.builder().build();
-        when(feesApi.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), any(BigDecimal.class)))
-                .thenReturn(response);
+
+        when(feesApi.lookupFee(
+                anyString(), anyString(), anyString(), anyString(), anyString(),
+                any(),
+                any(BigDecimal.class),
+                any()
+        )).thenReturn(response);
 
         feesClient.lookupFee(CHANNEL, EVENT, AMOUNT);
 
@@ -90,13 +91,32 @@ class FeesClientTest {
                 JURISDICTION_2,
                 CHANNEL,
                 EVENT,
-                AMOUNT
+                null,
+                AMOUNT,
+                null
         );
     }
 
     @Test
+    void shouldLookupFeeWithKeywordOverload() {
+        String keyword = "urgent";
+        FeeLookupResponseDto expectedResponse = FeeLookupResponseDto.builder()
+                .code("FEE-KEYWORD")
+                .build();
+
+        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, null, AMOUNT, keyword))
+                .thenReturn(expectedResponse);
+
+        FeeLookupResponseDto result = feesClient.lookupFee(CHANNEL, EVENT, AMOUNT, keyword);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getCode()).isEqualTo("FEE-KEYWORD");
+
+        verify(feesApi).lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, null, AMOUNT, keyword);
+    }
+
+    @Test
     void shouldFindRangeGroupSuccessfully() {
-        
         Fee2Dto fee1 = Fee2Dto.builder()
                 .code("FEE001")
                 .feeType("range")
@@ -139,7 +159,6 @@ class FeesClientTest {
 
     @Test
     void shouldPassCorrectParametersToFeesApiForFindRangeGroup() {
-        
         Fee2Dto[] response = new Fee2Dto[0];
         when(feesApi.findRangeGroup(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(response);
@@ -157,7 +176,6 @@ class FeesClientTest {
 
     @Test
     void shouldReturnEmptyArrayWhenNoRangeGroupsFound() {
-        
         Fee2Dto[] expectedResponse = new Fee2Dto[0];
         when(feesApi.findRangeGroup(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT))
                 .thenReturn(expectedResponse);
@@ -171,8 +189,7 @@ class FeesClientTest {
 
     @Test
     void shouldHandleNullResponseFromLookupFee() {
-        
-        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, AMOUNT))
+        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, null, AMOUNT, null))
                 .thenReturn(null);
 
         FeeLookupResponseDto result = feesClient.lookupFee(CHANNEL, EVENT, AMOUNT);
@@ -182,7 +199,6 @@ class FeesClientTest {
 
     @Test
     void shouldHandleNullResponseFromFindRangeGroup() {
-        
         when(feesApi.findRangeGroup(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT))
                 .thenReturn(null);
 
@@ -193,28 +209,26 @@ class FeesClientTest {
 
     @Test
     void shouldWorkWithEmptyStringConfigurationValues() {
-        
         FeesClient clientWithEmptyStrings = new FeesClient(feesApi, "", "", "");
         FeeLookupResponseDto expectedResponse = FeeLookupResponseDto.builder().build();
 
-        when(feesApi.lookupFee("", "", "", CHANNEL, EVENT, AMOUNT))
+        when(feesApi.lookupFee("", "", "", CHANNEL, EVENT, null, AMOUNT, null))
                 .thenReturn(expectedResponse);
 
         FeeLookupResponseDto result = clientWithEmptyStrings.lookupFee(CHANNEL, EVENT, AMOUNT);
 
         assertThat(result).isNotNull();
-        verify(feesApi).lookupFee("", "", "", CHANNEL, EVENT, AMOUNT);
+        verify(feesApi).lookupFee("", "", "", CHANNEL, EVENT, null, AMOUNT, null);
     }
 
     @Test
     void shouldLookupFeeWithDifferentAmounts() {
-        
         BigDecimal smallAmount = new BigDecimal("10.50");
         FeeLookupResponseDto expectedResponse = FeeLookupResponseDto.builder()
                 .feeAmount(new BigDecimal("5.00"))
                 .build();
 
-        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, smallAmount))
+        when(feesApi.lookupFee(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT, null, smallAmount, null))
                 .thenReturn(expectedResponse);
 
         FeeLookupResponseDto result = feesClient.lookupFee(CHANNEL, EVENT, smallAmount);
@@ -227,7 +241,6 @@ class FeesClientTest {
 
     @Test
     void shouldVerifyFeesApiIsCalledOnlyOnce() {
-        
         Fee2Dto[] expectedResponse = new Fee2Dto[1];
         when(feesApi.findRangeGroup(SERVICE, JURISDICTION_1, JURISDICTION_2, CHANNEL, EVENT))
                 .thenReturn(expectedResponse);
