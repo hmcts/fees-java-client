@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.fees.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.fees.client.health.InternalHealth;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
@@ -27,19 +26,11 @@ public interface FeesApi {
         @RequestParam(value = "keyword", required = false) String keyword
     );
 
-    @GetMapping("/fees-register/fees"
-        + "?service={service}"
-        + "&jurisdiction1={jurisdiction1}"
-        + "&jurisdiction2={jurisdiction2}"
-        + "&channel={channel}"
-        + "&event={eventType}"
-        + "&feeVersionStatus=approved"
-    )
+    @GetMapping("/fees-register/fees?feeVersionStatus=approved")
     Fee2Dto[] findRangeGroup(
-        @PathVariable("service") String service,
-        @PathVariable("jurisdiction1") String jurisdiction1,
-        @PathVariable("jurisdiction2") String jurisdiction2,
-        @PathVariable("channel") String channel,
-        @PathVariable("eventType") String eventType
-    );
+        @RequestParam("service") String service,
+        @RequestParam("jurisdiction1") String jurisdiction1,
+        @RequestParam("jurisdiction2") String jurisdiction2,
+        @RequestParam("channel") String channel,
+        @RequestParam("event") String eventType);
 }
