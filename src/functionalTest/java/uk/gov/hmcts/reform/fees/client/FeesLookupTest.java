@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @EnableAutoConfiguration
 @DisplayName("Fee lookup API")
@@ -18,18 +19,53 @@ class FeesLookupTest extends BaseTest {
 
     @Test
     @DisplayName("should retrieve the correct code for an amount")
-    void testValidRequest() {
+    void testValidProbateRequestWithKeyword() {
         FeeLookupResponseDto feeOutcome = feesApi.lookupFee(
-                "civil",
+                "probate",
+                "family",
+                "probate registry",
+                "default",
+                "issue",
+                "all",
+                BigDecimal.valueOf(238135.00),
+                "SA"
+        );
+        assertEquals("FEE0219", feeOutcome.getCode());
+    }
+
+    @Test
+    @DisplayName("should retrieve the correct code for an amount with keyword")
+    void testValidCivilRequestWithKeyword() {
+        FeeLookupResponseDto feeOutcome = feesApi.lookupFee(
+                "civil money claims",
                 "civil",
                 "county court",
-                "online",
+                "default",
                 "issue",
                 null,
-                BigDecimal.valueOf(100),
-                null
+                BigDecimal.valueOf(50000),
+                "MoneyClaim"
         );
-        assertEquals("FEE0211", feeOutcome.getCode());
+        assertEquals("FEE0209", feeOutcome.getCode());
+    }
+
+    @Test
+    @DisplayName("should return 404 Not Found when fee is missing")
+    void testCivilRequestWithMissingKeyword() {
+        FeignException.NotFound exception = assertThrows(
+                FeignException.NotFound.class,
+                () -> feesApi.lookupFee(
+                        "civil money claims",
+                        "civil",
+                        "county court",
+                        "default",
+                        "issue",
+                        null,
+                        BigDecimal.valueOf(50000),
+                        null
+                )
+        );
+        assertTrue(exception.getMessage().contains("fee for code=LookupFeeDto"));
     }
 
     @Test
@@ -45,7 +81,7 @@ class FeesLookupTest extends BaseTest {
                         "invalid event",
                         null,
                         BigDecimal.valueOf(-999.99),
-                        null
+                        "missingKeyword"
                 )
         );
         assertEquals(HttpStatus.BAD_REQUEST.value(), exception.status());
